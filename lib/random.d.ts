@@ -1,3 +1,4 @@
+declare module 'random';
 /** 
  * Returns a pseudo-random integer between min and max.
  * @param {number} max The maximum value.
