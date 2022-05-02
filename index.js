@@ -31,6 +31,19 @@ if (
 }
 
 if (
+    process.argv.includes('-h') || 
+    process.argv.includes('--help')
+) {
+    console.log(`
+    Random Password Generator v${version}. ${(version[0] + version[1]).includes("0.") ? 'Internal Build. For testing purposes only' : 'Public Build'}.
+    
+    Usage: 
+        npx santi-passgen [options]
+    `);
+    process.exit();
+}
+
+if (
     process.argv.includes('-v') || 
     process.argv.includes('--verbose') || 
     settings.verboseMode
