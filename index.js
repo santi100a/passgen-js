@@ -1,8 +1,8 @@
 // @ts-check
 import random from './lib/random.js';
-import { coloring, Coloring } from './lib/coloring.js';
-var colorin = await import('./lib/coloring.js');
+import coloring from './lib/coloring.js';
 import FS from 'fs';
+
 console.clear();
 try {
     const settingsFilePath = './settings.json';
@@ -13,6 +13,12 @@ try {
 
     const version = FS.existsSync('./package.json') ? 
     JSON.parse(FS.readFileSync('./package.json', 'utf-8')).version : '1.0.0';
+    (function setTerminalTitle(title)
+    {
+        process.stdout.write(
+            String.fromCharCode(27) + "]0;" + title + String.fromCharCode(7)
+        );
+    })("Random Password Generator v" + version);
 
     var passwordLength = 8, password = '';
 
