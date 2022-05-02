@@ -14,18 +14,7 @@ The settings file should be located in the same directory as the program, and it
 - **Entering an infinite loop or not**: specify the <code>infiniteLoop</code> key. The value of this key is a boolean; if it is true, then the program enters an infinite loop, otherwise, well, it doesn't.
 ## Usage
 Once you clone the repo, test the program by running <code>npm run test</code> from the command line in the directory where you cloned the repo. This will run the program and print the results.
-If everything is working, you should see something that looks like this:
-
-
-<code>
-&nbsp;&nbsp;&nbsp;&nbsp;Random Password Generator <br>
-&nbsp;&nbsp;&nbsp;&nbsp;========================= <br>
-
-Amount of possible characters: 94 <br>
-Password length: 8 <br>
-Password: *random password* <br>
-</code>
-If everything is working, you mow can specify these flags on the command line or set the proper keys in the <code>settings.jsonc</code> file:
+If everything is working, you can now specify these flags on the command line or set the proper keys in the <code>settings.jsonc</code> file:
 
 - <code>-h</code> or <code>--help</code>: Show a help message.
 - <code>-a</code> or <code>--about</code>: Show about message.
