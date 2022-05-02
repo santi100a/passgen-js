@@ -3,11 +3,12 @@ import coloring from './lib/coloring.js';
 import ReadLineSync from 'readline-sync';
 import FS from 'fs';
 
-const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789¿?{}[]()<>!@#$%^&*_+-=:;|~`\'\\/.,';
 const settingsFilePath = './settings.jsonc';
 const settings = FS.existsSync(settingsFilePath) ? 
 JSON.parse(FS.readFileSync(settingsFilePath, 'utf-8')) :
 {};
+const chars = settings.chars || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789¿?{}[]()<>!@#$%^&*_+-=:;|~`\'\\/.,';
+
 const version = FS.existsSync('./package.json') ? 
 JSON.parse(FS.readFileSync('./package.json', 'utf-8')).version : '1.0.0';
 
