@@ -13,8 +13,7 @@ try {
 
     const version = FS.existsSync('./package.json') ? 
     JSON.parse(FS.readFileSync('./package.json', 'utf-8')).version : '1.0.0';
-    (function setTerminalTitle(title)
-    {
+    (function setTerminalTitle(title) {
         process.stdout.write(
             String.fromCharCode(27) + "]0;" + title + String.fromCharCode(7)
         );
