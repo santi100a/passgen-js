@@ -1,6 +1,5 @@
 import random from './lib/random.js';
 import coloring from './lib/coloring.js';
-import ReadLineSync from 'readline-sync';
 import FS from 'fs';
 
 const settingsFilePath = './settings.jsonc';
