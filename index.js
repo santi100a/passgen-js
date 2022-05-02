@@ -14,6 +14,12 @@ JSON.parse(FS.readFileSync('./package.json', 'utf-8')).version : '1.0.0';
 
 var passwordLength = 8, password = '';
 
+if (
+    process.argv.includes('-v') || 
+    process.argv.includes('--version')
+) {
+    console.log(version); process.exit();
+}
 console.clear();
 console.log('\t\tRandom Password Generator');
 console.log('\t\t=========================\n');
@@ -22,7 +28,7 @@ if (
     process.argv.includes('--about')
 ) {
     console.log(`
-    Random Password Generator v${version}. ${(version[0] + version[1]).includes("0.") ? 'Internal Build. For testing purposes only' : 'Public Build'}.
+    Random Password Generator v${version}. ${(version[0] + version[1]).includes('0.') ? 'Internal Build. For testing purposes only' : 'Public Build'}.
     Copyright (C) 2022 S Industries, Inc. All rights reserved.
     ( Well, not actually. I'm just Santi! Check out the project on GitHub! )
     https://github.com/santi100a/passgen-js/
@@ -34,17 +40,25 @@ if (
     process.argv.includes('-h') || 
     process.argv.includes('--help')
 ) {
+    console.clear();
     console.log(`
-    Random Password Generator v${version}. ${(version[0] + version[1]).includes("0.") ? 'Internal Build. For testing purposes only' : 'Public Build'}.
+    Random Password Generator v${version}. ${(version[0] + version[1]).includes('0.') ? 'Internal Build. For testing purposes only' : 'Public Build'}.
     
     Usage: 
-        npx santi-passgen [options]
+        node . [options]
+    Options:
+        -h, --help: Show this help message.
+        -a, --about: Show about message.
+        --verbose: Enable verbose mode.
+        -i, --infinite: Enable infinite mode.
+        -v, --version: Show version.
     `);
     process.exit();
 }
 
+
+
 if (
-    process.argv.includes('-v') || 
     process.argv.includes('--verbose') || 
     settings.verboseMode
 ) 
