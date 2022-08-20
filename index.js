@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 // @ts-check
 import random from './lib/random.js';
 import coloring from './lib/coloring.js';
@@ -10,6 +11,17 @@ try {
     JSON.parse(FS.readFileSync(settingsFilePath, 'utf-8')) :
     {};
     const chars = settings.chars || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789¿?{}[]()<>!@#$%^&*_+-=:;|~`\'\\/.,';
+    const
+    includesVersion =  process.argv.includes('-v') || 
+    process.argv.includes('--version'),
+    includesAbout = process.argv.includes('-a') || 
+    process.argv.includes('--about'),
+    includesHelp = process.argv.includes('-h') || 
+    process.argv.includes('--help'),
+    settingsExist = FS.existsSync('./settings.json'),
+    includesVerbose = process.argv.includes('--verbose'),
+    includesInfinite = process.argv.includes('-i') || 
+    process.argv.includes('--infinite');
 
     const version = FS.existsSync('./package.json') ? 
     JSON.parse(FS.readFileSync('./package.json', 'utf-8')).version : '1.0.0';
@@ -19,21 +31,15 @@ try {
         );
     })("Random Password Generator v" + version);
 
-    var passwordLength = 8, password = '';
+    let passwordLength = 8, password = '';
 
-    if (
-        process.argv.includes('-v') || 
-        process.argv.includes('--version')
-    ) {
+    if (includesVersion) {
         console.log(version); process.exit();
     }
     console.clear();
     console.log('\t\tRandom Password Generator');
     console.log('\t\t=========================\n');
-    if (
-        process.argv.includes('-a') || 
-        process.argv.includes('--about')
-    ) {
+    if (includesAbout) {
         console.log(`
         Random Password Generator v${version}. ${(version[0] + version[1]).includes('0.') ? 'Internal Build. For testing purposes only' : 'Public Build'}.
         Copyright (C) 2022 S Industries, Inc. All rights reserved.
@@ -43,10 +49,7 @@ try {
         process.exit();
     }
 
-    if (
-        process.argv.includes('-h') || 
-        process.argv.includes('--help')
-    ) {
+    if (includesHelp) {
         console.clear();
         console.log(`
         Random Password Generator v${version}. ${(version[0] + version[1]).includes('0.') ? 'Internal Build. For testing purposes only' : 'Public Build'}.
@@ -63,30 +66,27 @@ try {
         process.exit();
     }
 
-    if (!FS.existsSync('./settings.json') && (process.argv.includes('-v') || process.argv.includes('--verbose'))) console.log(
+    if (!settingsExist && includesVerbose) console.log(
        coloring('Settings file does not exist. Not using settings file. ', 'yellow')
     );
 
     if (
-        process.argv.includes('--verbose') || 
+        includesVerbose || 
         settings.verboseMode
     ) 
-        console.log('Either the settings file contains "verboseMode": true or you specified -v or --verbose flags. Verbose mode ' + coloring('enabled.', 'green'));
+        console.log('Either the settings file contains "verboseMode": true or you specified the --verbose flag. Verbose mode ' + coloring('enabled.', 'green'));
     if (settings.passwordLength) {
         passwordLength = settings.passwordLength;
     }
     if (
         settings.infiniteLoop || 
-        process.argv.includes('-i') || 
-        process.argv.includes('--infinite')
+        includesInfinite
     ) {
         if (
-            process.argv.includes('-v') || 
-            process.argv.includes('--verbose')
+            includesVerbose
         )
         if (settings.infiniteLoop || 
-            process.argv.includes('-i') || 
-            process.argv.includes('--infinite'))
+            includesInfinite)
         console.log('Either the settings file contains "infiniteLoop": true or you specified the -i or --infinite flags. Infinite loop ' + coloring('enabled.', 'green'));
         let currentPasswordIndex = 0;
         while (true) {

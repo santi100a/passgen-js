@@ -1,14 +1,14 @@
 {
   "name": "santi-passgen",
   "version": "1.0.0",
-  "description": "",
+  "description": "A random password generator written in JavaScript.",
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
-    "test": "node ."
+    "start": "node ."
   },
   "keywords": [],
-  "author": "",
+  "author": "@santi100",
   "license": "ISC",
   "type": "module",
   "dependencies": {
