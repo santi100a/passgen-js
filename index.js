@@ -1,8 +1,8 @@
 #! /usr/bin/env node
 // @ts-check
-import random from './lib/random.js';
-import coloring from './lib/coloring.js';
-import FS from 'fs';
+import { random } from './lib/random.js';
+import { coloring } from './lib/coloring.js';
+import * as FS from 'fs';
 
 console.clear();
 try {
@@ -101,7 +101,7 @@ try {
     } else {
         password = '';
         for (let i = 0; i < passwordLength; i++) {
-            password += chars[random(chars.length)];
+            password += chars[random(chars.length)]; //! It produces undefined sometimes
         }
         console.log('Amount of possible characters:', chars.length);
         console.log('Password length:', passwordLength);
@@ -112,4 +112,5 @@ try {
     if (error instanceof SyntaxError) {
         console.log(coloring('Syntax error somewhere in the settings file. Please make sure the settings.json file does not contain any syntax errors (like comments, for instance).', 'red'));
     } 
+    throw error;
 }
