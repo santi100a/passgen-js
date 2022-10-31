@@ -1,0 +1,5 @@
+{
+    "$schema": "https://santi-apis.vercel.app/utils/json-schema",
+    "verboseMode": true,
+    "passwordLength": 10
+}

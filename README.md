@@ -19,6 +19,7 @@ Once you clone the repo, run the program by running ```node .``` from the comman
 
 - ```-h``` or ```--help```: Show a help message.
 - ```-a``` or ```--about```: Show about message.
-- ```--verbose```: Enable verbose mode.
+- ```-v or --verbose```: Enable verbose mode.
 - ```-i``` or ```--infinite```: Enable infinite mode.
-- ```-v``` or ```--version```: Show version.
+- ```-V``` or ```--version```: Show version.
+Since none of the flags require any parameters, you can actually join them, like this: ```-vi```.

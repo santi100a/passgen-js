@@ -1,116 +1,96 @@
 #! /usr/bin/env node
 // @ts-check
-import { random } from './lib/random.js';
-import { coloring } from './lib/coloring.js';
-import * as FS from 'fs';
 
-console.clear();
-try {
-    const settingsFilePath = './settings.json';
-    const settings = FS.existsSync(settingsFilePath) ? 
-    JSON.parse(FS.readFileSync(settingsFilePath, 'utf-8')) :
-    {};
-    const chars = settings.chars || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789¿?{}[]()<>!@#$%^&*_+-=:;|~`\'\\/.,';
-    const
-    includesVersion =  process.argv.includes('-v') || 
-    process.argv.includes('--version'),
-    includesAbout = process.argv.includes('-a') || 
-    process.argv.includes('--about'),
-    includesHelp = process.argv.includes('-h') || 
-    process.argv.includes('--help'),
-    settingsExist = FS.existsSync('./settings.json'),
-    includesVerbose = process.argv.includes('--verbose'),
-    includesInfinite = process.argv.includes('-i') || 
-    process.argv.includes('--infinite');
+const { randomFromArray } = require('./lib/random-cjs.js');
+const { coloring } = require('./lib/coloring-cjs.js');
+const { Command } = require('commander');
+const { textSync } = require('figlet');
+const { question } = require('readline-sync');
+const FS = require('node:fs');
+const CONF_PATH = './pgconfig.json';
+const conf = JSON.parse(
+    FS.existsSync(CONF_PATH) ? 
+    FS.readFileSync(CONF_PATH, 'utf8') : 
+    '{}'
+)
 
-    const version = FS.existsSync('./package.json') ? 
-    JSON.parse(FS.readFileSync('./package.json', 'utf-8')).version : '1.0.0';
-    (function setTerminalTitle(title) {
-        process.stdout.write(
-            String.fromCharCode(27) + "]0;" + title + String.fromCharCode(7)
-        );
-    })("Random Password Generator v" + version);
-
-    let passwordLength = 8, password = '';
-
-    if (includesVersion) {
-        console.log(version); process.exit();
-    }
+const CLI_NAME = 'Random Password Generator';
+const CLI_COMMAND = 'passgen';
+const PACKAGE_JSON = './package.json';
+const NUMS = '1234567890';
+const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const LOWER = 'abcdefghijklmnopqrstuvwxyz';
+const SYMBOLS = '°!"#$%&/()=?¡¨*[];:_\\\"\'|!¿';
+const program = new Command(CLI_COMMAND);
+const CHARS = conf.chars || 
+NUMS + UPPER + LOWER + SYMBOLS;
+const LENGTH = conf.passwordLength || 8;
+const VERSION = FS.existsSync(PACKAGE_JSON) ? 'v'.concat(
+    JSON.parse(FS.readFileSync(PACKAGE_JSON, 'utf8')).version) : 'v1.0.0'
+    
     console.clear();
-    console.log('\t\tRandom Password Generator');
-    console.log('\t\t=========================\n');
-    if (includesAbout) {
-        console.log(`
-        Random Password Generator v${version}. ${(version[0] + version[1]).includes('0.') ? 'Internal Build. For testing purposes only' : 'Public Build'}.
-        Copyright (C) 2022 S Industries, Inc. All rights reserved.
-        ( Well, not actually. I'm just Santi! Check out the project on GitHub! )
-        https://github.com/santi100a/passgen-js/
+console.log(coloring(textSync(CLI_NAME), 'green'));
+program
+    .version(VERSION)
+    .description('A CLI to generate a random password.')
+    .option('-i, --infinite', 'Enter infinite mode.')
+    .option('-v, --verbose', 'Enter verbose mode.')
+    .option('-a, --about', 'Show about message.')
+    .parse(process.argv);
+
+const options = program.opts();
+
+const VERBOSE_MODE = conf.verboseMode || options.verbose;
+const VERBOSE_PROMPT = coloring(coloring('[VERBOSE]', 'cyan'), 'bold')
+/**
+ * @param {number} length The length of the password.
+ * @param {string} chars The characters to be on the password.
+ */
+function generatePassword(length, chars) {
+    const passArray = [];
+    Array(length).fill(null).forEach(() => {
+        passArray.push(randomFromArray(chars.split('')));
+    })
+    return passArray.join('')
+}
+if (VERBOSE_MODE) console.log(`Verbose mode flag or setting specified. 
+${coloring('Enabling', 'green')} verbose mode.`);
+
+if (VERBOSE_MODE && !(FS.existsSync(CONF_PATH))) 
+    console.log(`${VERBOSE_PROMPT} Settings file doesn't exist.
+${VERBOSE_PROMPT} Falling back to command-line flags.
         `);
-        process.exit();
+else 
+if (FS.existsSync(CONF_PATH)) console.log(`${VERBOSE_PROMPT} Settings file ${CONF_PATH} detected.
+${VERBOSE_PROMPT} Now, the settings specified in this file will be used.
+${VERBOSE_PROMPT} We recommend that you use the schema at https://santi-apis.vercel.app/utils/json-schema for 
+${VERBOSE_PROMPT} this file.
+`);
+const password = generatePassword(LENGTH, CHARS);
+console.log(`
+Password length: ${LENGTH}.
+Password: ${password}.
+`)
+if (options.infinite || conf.infiniteLoop) {
+    if (VERBOSE_MODE) console.log(`${VERBOSE_PROMPT} Infinite mode enabled.
+${VERBOSE_PROMPT} Now, until you press Ctrl-C, thousands of random passwords will be created.
+    `);
+    console.log(`
+Password length: ${LENGTH}.
+    `)
+    let i = 1;
+    while (1 === (2 - 1)) {
+        const password = generatePassword(LENGTH, CHARS);
+        console.log('Password #%d: %s', i, password);
+        i++;
     }
-
-    if (includesHelp) {
-        console.clear();
-        console.log(`
-        Random Password Generator v${version}. ${(version[0] + version[1]).includes('0.') ? 'Internal Build. For testing purposes only' : 'Public Build'}.
-        
-        Usage: 
-            node . [options]
-        Options:
-            -h, --help: Show this help message.
-            -a, --about: Show about message.
-            --verbose: Enable verbose mode.
-            -i, --infinite: Enable infinite mode.
-            -v, --version: Show version.
-        `);
-        process.exit();
-    }
-
-    if (!settingsExist && includesVerbose) console.log(
-       coloring('Settings file does not exist. Not using settings file. ', 'yellow')
-    );
-
-    if (
-        includesVerbose || 
-        settings.verboseMode
-    ) 
-        console.log('Either the settings file contains "verboseMode": true or you specified the --verbose flag. Verbose mode ' + coloring('enabled.', 'green'));
-    if (settings.passwordLength) {
-        passwordLength = settings.passwordLength;
-    }
-    if (
-        settings.infiniteLoop || 
-        includesInfinite
-    ) {
-        if (
-            includesVerbose
-        )
-        if (settings.infiniteLoop || 
-            includesInfinite)
-        console.log('Either the settings file contains "infiniteLoop": true or you specified the -i or --infinite flags. Infinite loop ' + coloring('enabled.', 'green'));
-        let currentPasswordIndex = 0;
-        while (true) {
-            password = '';
-            for (let i = 0; i < passwordLength; i++) {
-                password += chars[random(chars.length)];
-            }
-            currentPasswordIndex++;
-            console.log(`Password #${currentPasswordIndex}:`, password);
-            
-        }
-    } else {
-        password = '';
-        for (let i = 0; i < passwordLength; i++) {
-            password += chars[random(chars.length)]; //! It produces undefined sometimes
-        }
-        console.log('Amount of possible characters:', chars.length);
-        console.log('Password length:', passwordLength);
-        console.log('Password:', password);
-    }
-} catch (error) {
-    console.clear();
-    if (error instanceof SyntaxError) {
-        console.log(coloring('Syntax error somewhere in the settings file. Please make sure the settings.json file does not contain any syntax errors (like comments, for instance).', 'red'));
-    } 
-    throw error;
+}
+if (options.about) {
+    console.log(`
+    Random Password Generator ${VERSION}.
+    Copyright (C) 2020-${(new Date).getUTCFullYear()} S Industries, Inc. All rights reserved.
+    Actually no. I'm just Santi yet! Check out this project on GitHub!
+    ( https://github.com/santi100a/passgen-js/ ).
+    `)
+    process.exit(0);
 }

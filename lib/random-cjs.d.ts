@@ -15,5 +15,11 @@ declare function random(max: number, min?: number): number;
  * between min and max.
  */
 declare function randomFloat(max: number, min?: number): number;
+/**
+ * Returns a random item from an array passed as argument.
+ * @param array The array from which you want to pick a random value.
+ * @returns A random item from the given array.
+ */
+declare function randomFromArray<T = unknown>(array: T[]): T;
 export default random;
-export { random, randomFloat };
+export { random, randomFloat, randomFromArray };
