@@ -1,6 +1,9 @@
 {
   "name": "@santi100/passgen",
   "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/santi100a/passgen-js.git"
+  },
   "description": "A random password generator written in JavaScript.",
   "main": "index.js",
   "bin": "index.js",
