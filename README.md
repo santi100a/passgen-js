@@ -15,7 +15,28 @@ The settings file should be located in the same directory as the program, and it
 
 ## Usage
 
-Once you clone the repo, run the program by running ```node .``` from the command line in the directory where you cloned the repo. You can now specify these flags on the command line or set the proper keys in the ```settings.json``` file:
+To use this CLI, you have four methods:
+### Through Source Control
+- Clone this repo.
+- Enter the directory where you cloned the repo.
+- Run ```npm install``` to install dependencies.
+- Run the CLI by running ```node .```.
+
+### Through Source Distributables
+- Enter the ```dist``` directory. 
+- Download the corresponding executable for your platform.
+- Run the CLI by running this file.
+
+### Through Distributable Releases
+- Enter our latest release.
+- Download the corresponding executable for your platform.
+- Run the CLI by running this file.
+
+### Through Global Install Via NPM
+- Run ```npm install -g @santi100/passgen@latest```.
+- Run the CLI by running ```npx @santi100/passgen```.
+
+You can now specify these flags on the command line or set the proper keys in the ```pgconfig.json``` file:
 
 - ```-h``` or ```--help```: Show a help message.
 - ```-a``` or ```--about```: Show about message.
