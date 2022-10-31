@@ -5,7 +5,6 @@ const { randomFromArray } = require('./lib/random-cjs.js');
 const { coloring } = require('./lib/coloring-cjs.js');
 const { Command } = require('commander');
 const { textSync } = require('figlet');
-const { question } = require('readline-sync');
 const FS = require('node:fs');
 const CONF_PATH = './pgconfig.json';
 const conf = JSON.parse(

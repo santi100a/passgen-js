@@ -1,11 +1,11 @@
 {
-  "name": "santi-passgen",
+  "name": "@santi100/passgen",
   "version": "1.0.0",
   "description": "A random password generator written in JavaScript.",
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
-    "build": "pkg ."
+    "build": "pkg . --out-path dist/ --compress GZip"
   },
   "keywords": [],
   "author": "@santi100",
