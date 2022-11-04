@@ -42,5 +42,7 @@ You can now specify these flags on the command line or set the proper keys in th
 - ```-a``` or ```--about```: Show about message.
 - ```-v or --verbose```: Enable verbose mode.
 - ```-i``` or ```--infinite```: Enable infinite mode.
+- ```-c``` or ```--create```: Scaffold a basic settings file.
+- ```-p``` or ```--prompt```: Override flags and prompt the user directly.
 - ```-V``` or ```--version```: Show version.
 Since none of the flags require any parameters, you can actually join them, like this: ```-vi```.

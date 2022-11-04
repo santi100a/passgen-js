@@ -43,10 +43,13 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
             return [null, error];
         }
     }
-    const [conf, error] = await readJSON(CONF_PATH);
+    const [config, error] = await readJSON(CONF_PATH);
+    const conf = config || {};
     if (error) {
-        console.error((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)('✗ An error has ocurred while reading the settings file. ' + error, 'red'), 'bold'));
-        process.exit(1);
+        if (FS.existsSync(CONF_PATH)) {
+            console.error((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)('✗ An error has ocurred while reading the settings file. ' + error, 'red'), 'bold'));
+            process.exit(1);
+        }
     }
     const CLI_COMMAND = 'passgen';
     const NUMS = '1234567890';
@@ -57,7 +60,7 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
     const CHARS = conf.chars ||
         NUMS + UPPER + LOWER + SYMBOLS;
     const LENGTH = conf.passwordLength || 10;
-    const VERSION = 'v1.0.4';
+    const VERSION = 'v1.0.5';
     program
         .version(VERSION)
         .description('A CLI to generate a random password.')
@@ -65,7 +68,7 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
         .option('-v, --verbose', 'Enter verbose mode.')
         .option('-a, --about', 'Show about message.')
         .option('-p, --prompt', 'Override flags and prompt the user directly.')
-        .option('-c, --create', 'Create a basic settings file.')
+        .option('-c, --create', 'Scaffold a basic settings file.')
         .parse(process.argv);
     const options = program.opts();
     if (options.create) {
@@ -73,18 +76,27 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
             try {
                 await FS.promises.writeFile(CONF_PATH, JSON.stringify({
                     $schema: 'https://santi-apis.vercel.app/utils/json-schema'
-                }), 'utf8');
+                }, null, 4), 'utf8');
                 return null;
             }
             catch (e) {
                 return error;
             }
         }
-        const err = await create();
-        if (!err)
-            console.log((0, coloring_cjs_js_1.coloring)(`✓ Successfully created ${CONF_PATH}`, 'green'));
-        else
-            console.log((0, coloring_cjs_js_1.coloring)('✗ An error has ocurred while reading the settings file. ' + err, 'red'));
+        if (!FS.existsSync(CONF_PATH)) {
+            const err = await create();
+            if (!err)
+                console.log((0, coloring_cjs_js_1.coloring)(`✓ Successfully created ${CONF_PATH}.`, 'green'));
+            else {
+                console.log((0, coloring_cjs_js_1.coloring)('✗ An error has ocurred while creating the settings file. ' + err, 'red'));
+                process.exit(1);
+            }
+            process.exit(0);
+        }
+        else {
+            console.log((0, coloring_cjs_js_1.coloring)('🛈 The settings file exists already.', 'cyan'));
+            process.exit(0);
+        }
     }
     if (!FS.existsSync(CONF_PATH)) {
         const { prom } = await inquirer.prompt({

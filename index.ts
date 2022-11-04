@@ -29,14 +29,17 @@ console.log(coloring(
             return [null, error as Error];
         }
     }
-    const [ conf, error ] = await readJSON(CONF_PATH);
+    const [ config, error ] = await readJSON(CONF_PATH);
+    const conf = config as Record<any, any> || {};
     if (error) {
-        console.error(
-            coloring(
-                coloring('✗ An error has ocurred while reading the settings file. ' + error, 'red'),
-            'bold')
-        );
-        process.exit(1);
+        if (FS.existsSync(CONF_PATH)) {
+            console.error(
+                coloring(
+                    coloring('✗ An error has ocurred while reading the settings file. ' + error, 'red'),
+                'bold')
+            );
+            process.exit(1);
+        }
     }
 
     
@@ -51,7 +54,7 @@ console.log(coloring(
     const CHARS = conf.chars || 
     NUMS + UPPER + LOWER + SYMBOLS;
     const LENGTH = conf.passwordLength || 10;
-    const VERSION = 'v1.0.4';
+    const VERSION = 'v1.0.5';
 
     program
         .version(VERSION)
@@ -60,7 +63,7 @@ console.log(coloring(
         .option('-v, --verbose', 'Enter verbose mode.')
         .option('-a, --about', 'Show about message.')
         .option('-p, --prompt', 'Override flags and prompt the user directly.')
-        .option('-c, --create', 'Create a basic settings file.')
+        .option('-c, --create', 'Scaffold a basic settings file.')
         .parse(process.argv);
         
         const options = program.opts();
@@ -69,18 +72,26 @@ console.log(coloring(
                 try {
                     await FS.promises.writeFile(CONF_PATH, JSON.stringify({
                         $schema: 'https://santi-apis.vercel.app/utils/json-schema'
-                    }), 'utf8');
+                    }, null, 4), 'utf8');
                     return null;
                 } catch (e) {
                     return error;
                 }
             }
+        if (!FS.existsSync(CONF_PATH)) {
             const err = await create();
             if (!err) 
-                console.log(coloring(`✓ Successfully created ${CONF_PATH}`, 'green'))
-            else 
-                console.log(coloring('✗ An error has ocurred while reading the settings file. ' + err, 'red'))
+                console.log(coloring(`✓ Successfully created ${CONF_PATH}.`, 'green'))
+            else {
+                console.log(coloring('✗ An error has ocurred while creating the settings file. ' + err, 'red'));
+                process.exit(1);
+            }
+            process.exit(0);
+        } else {
+            console.log(coloring('🛈 The settings file exists already.', 'cyan'));
+            process.exit(0);
         }
+    }
         if (!FS.existsSync(CONF_PATH)) {
             const { prom } = await inquirer.prompt({
                 name: 'prom',
