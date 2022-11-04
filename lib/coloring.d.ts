@@ -1,4 +1,6 @@
-declare type Color = 'black' | 'red' | 'green' | 'yellow' | 'blue'  | 'magenta' | 'cyan' | 'white' | 'bold';
+declare type Color = 'black' | 'red' | 'green' | 'yellow' | 'blue'  | 'magenta' | 'cyan' | 'white' | 
+'bold' | 'blink' | 'conceal';
+declare type Effect = 'bold' | 'blink' | 'conceal';
 
 /**
  * 
@@ -6,6 +8,13 @@ declare type Color = 'black' | 'red' | 'green' | 'yellow' | 'blue'  | 'magenta' 
  * @param color The color to paint the string in.
  */
 declare function coloring(string: string, color: Color): string;
+/**
+ * 
+ * @param string The string to paint in color! 
+ * @param color The colors to paint the string in.
+ */
+declare function coloring(string: string, color: [Color, ...Effect]): string;
+
 declare class Coloring {
     black(text: string): Coloring;
     red(text: string): Coloring;
@@ -20,5 +29,5 @@ declare class Coloring {
     conceal(text: string): Coloring;
     resolve(): string;
 }
+export { coloring, Coloring, Color, Effect };
 export default coloring;
-export { coloring, Color, Coloring };

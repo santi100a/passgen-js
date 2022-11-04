@@ -33,6 +33,7 @@ const CLI_NAME = 'Random Password Generator';
 console.clear();
 console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, figlet_1.textSync)(CLI_NAME, 'Standard'), 'bold'), 'cyan'));
 (async function () {
+    const inquirer = require('inquirer');
     const CONF_PATH = './pgconfig.json';
     async function readJSON(file, encoding) {
         try {
@@ -44,8 +45,7 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
     }
     const [conf, error] = await readJSON(CONF_PATH);
     if (error) {
-        const colorInstance = new coloring_cjs_js_1.Coloring();
-        console.error(colorInstance.red('✗ An error has ocurred while reading the settings file. ' + error).bold('').resolve());
+        console.error((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)('✗ An error has ocurred while reading the settings file. ' + error, 'red'), 'bold'));
         process.exit(1);
     }
     const CLI_COMMAND = 'passgen';
@@ -56,18 +56,101 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
     const program = new commander_1.Command(CLI_COMMAND);
     const CHARS = conf.chars ||
         NUMS + UPPER + LOWER + SYMBOLS;
-    const LENGTH = conf.passwordLength || 8;
-    const VERSION = 'v1.0.3';
+    const LENGTH = conf.passwordLength || 10;
+    const VERSION = 'v1.0.4';
     program
         .version(VERSION)
         .description('A CLI to generate a random password.')
         .option('-i, --infinite', 'Enter infinite mode.')
         .option('-v, --verbose', 'Enter verbose mode.')
         .option('-a, --about', 'Show about message.')
+        .option('-p, --prompt', 'Override flags and prompt the user directly.')
+        .option('-c, --create', 'Create a basic settings file.')
         .parse(process.argv);
     const options = program.opts();
+    if (options.create) {
+        async function create() {
+            try {
+                await FS.promises.writeFile(CONF_PATH, JSON.stringify({
+                    $schema: 'https://santi-apis.vercel.app/utils/json-schema'
+                }), 'utf8');
+                return null;
+            }
+            catch (e) {
+                return error;
+            }
+        }
+        const err = await create();
+        if (!err)
+            console.log((0, coloring_cjs_js_1.coloring)(`✓ Successfully created ${CONF_PATH}`, 'green'));
+        else
+            console.log((0, coloring_cjs_js_1.coloring)('✗ An error has ocurred while reading the settings file. ' + err, 'red'));
+    }
+    if (!FS.existsSync(CONF_PATH)) {
+        const { prom } = await inquirer.prompt({
+            name: 'prom',
+            message: `File ${CONF_PATH} doesn't exist. Prompt for options?`
+        });
+        if (prom)
+            await prompt();
+    }
+    if (options.prompt)
+        await prompt();
+    async function prompt() {
+        const { infinite } = await inquirer.prompt({
+            name: 'infinite',
+            type: 'confirm',
+            message: 'Enter infinite mode?',
+        });
+        const { verbose } = await inquirer.prompt({
+            name: 'verbose',
+            type: 'confirm',
+            message: 'Enter verbose mode?',
+        });
+        const { len: lenString } = await inquirer.prompt({
+            name: 'len',
+            type: 'text',
+            message: 'Enter password length:',
+        });
+        const len = Number(lenString);
+        const { chars } = await inquirer.prompt({
+            name: 'chars',
+            type: 'text',
+            message: 'Type all characters you want to use for the password (press ENTER ⤷ to use default):',
+        });
+        if (verbose)
+            console.log('Verbose mode %s', (0, coloring_cjs_js_1.coloring)('enabled.', 'green'));
+        if (infinite) {
+            let i = 1;
+            while (true) {
+                if (0)
+                    break;
+                const password = generatePassword(len || 10, chars ||
+                    NUMS + UPPER + LOWER + SYMBOLS);
+                console.log('Password #%d: %s', i, password);
+                i++;
+            }
+        }
+        console.log('Password length: %d.', len);
+        console.log('Password: %s.', generatePassword(len || 10, chars ||
+            NUMS + UPPER + LOWER + SYMBOLS));
+        process.exit(0);
+    }
     const VERBOSE_MODE = conf.verboseMode || options.verbose;
     const VERBOSE_PROMPT = (0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)('[VERBOSE]', 'cyan'), 'bold');
+    if (VERBOSE_MODE)
+        console.log(`Verbose mode flag or setting specified. 
+    ${(0, coloring_cjs_js_1.coloring)('Enabling', 'green')} verbose mode.`);
+    if (VERBOSE_MODE && !(FS.existsSync(CONF_PATH)))
+        console.log(`${VERBOSE_PROMPT} Settings file doesn't exist.
+    ${VERBOSE_PROMPT} Falling back to command-line flags.
+                `);
+    if (VERBOSE_MODE && FS.existsSync(CONF_PATH))
+        console.log(`${VERBOSE_PROMPT} Settings file ${CONF_PATH} detected.
+    ${VERBOSE_PROMPT} Now, the settings specified in this file will be used.
+    ${VERBOSE_PROMPT} We recommend that you use the schema at https://santi-apis.vercel.app/utils/json-schema for 
+    ${VERBOSE_PROMPT} this file.
+        `);
     function generatePassword(length, chars) {
         const passArray = [];
         Array(length).fill(null).forEach(() => {
@@ -75,23 +158,10 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
         });
         return passArray.join('');
     }
-    if (VERBOSE_MODE)
-        console.log(`Verbose mode flag or setting specified. 
-    ${(0, coloring_cjs_js_1.coloring)('Enabling', 'green')} verbose mode.`);
-    if (VERBOSE_MODE && !(FS.existsSync(CONF_PATH)))
-        console.log(`${VERBOSE_PROMPT} Settings file doesn't exist.
-    ${VERBOSE_PROMPT} Falling back to command-line flags.
-            `);
-    if (VERBOSE_MODE && FS.existsSync(CONF_PATH))
-        console.log(`${VERBOSE_PROMPT} Settings file ${CONF_PATH} detected.
-    ${VERBOSE_PROMPT} Now, the settings specified in this file will be used.
-    ${VERBOSE_PROMPT} We recommend that you use the schema at https://santi-apis.vercel.app/utils/json-schema for 
-    ${VERBOSE_PROMPT} this file.
-    `);
     if (options.infinite || conf.infiniteLoop) {
         if (VERBOSE_MODE)
             console.log(`${VERBOSE_PROMPT} Infinite mode enabled.
-    ${VERBOSE_PROMPT} Now, until you press Ctrl-C, thousands of random passwords will be created.
+${VERBOSE_PROMPT} Now, until you press Ctrl-C, thousands of random passwords will be created.
         `);
         console.log(`
     Password length: ${LENGTH}.
@@ -105,16 +175,16 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
     }
     if (options.about) {
         console.log(`
-    Random Password Generator ${VERSION}.
-    Copyright (C) 2020-${(new Date).getUTCFullYear()} S Industries, Inc. All rights reserved.
-    Actually no. I'm just Santi yet! Check out this project on GitHub!
-    ( https://github.com/santi100a/passgen-js/ ).
+Random Password Generator ${VERSION}.
+Copyright (C) 2020-${(new Date).getUTCFullYear()} S Industries, Inc. All rights reserved.
+Actually no. I'm just Santi yet! Check out this project on GitHub!
+( https://github.com/santi100a/passgen-js/ ).
         `);
         process.exit(0);
     }
     const password = generatePassword(LENGTH, CHARS);
     console.log(`
-    Password length: ${LENGTH}.
-    Password: ${password}.
+Password length: ${LENGTH}.
+Password: ${password}.
     `);
 })();

@@ -1,3 +1,4 @@
 node_modules
 pgconfig.json
 tsconfig.json
+dev-*.*
