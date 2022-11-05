@@ -1,4 +1,3 @@
 node_modules
-pgconfig.json
-tsconfig.json
+*config.json
 dev-*.*
