@@ -4,7 +4,7 @@ This is a password generator that generates random passwords.
 The resulting passwords don't make any sense, but they are random
 (and thus, **very** secure).
 You can specify a **lot** of different parameters to modify the
-way the program generates passwords in the ```settings.json``` file.
+way the program generates passwords in the ```pgconfig.json``` file.
 
 The settings file should be located in the same directory as the program, and it can alter these parameters:
 
