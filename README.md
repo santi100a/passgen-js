@@ -12,6 +12,7 @@ The settings file should be located in the same directory as the program, and it
 - **Booting to verbose mode or not**: specify the ```verboseMode``` key. The value of this key is a boolean; if it is true, then the program enters verbose mode, otherwise, well, it doesn't.
 - **The password's length**: specify the ```passwordLength``` key. The value of this key is an integer; the length of the password.
 - **Entering an infinite loop or not**: specify the ```infiniteLoop``` key. The value of this key is a boolean; if it is true, then the program enters an infinite loop, otherwise, well, it doesn't.
+- **The amount of passwords to generate**: specify the ```passwordCount``` key. The value of this key is an integer; the amount of passwords to generate.
 
 ## Usage
 

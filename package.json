@@ -1,6 +1,6 @@
 {
   "name": "@santi100/passgen",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "repository": {
     "url": "https://github.com/santi100a/passgen-js.git"
   },
@@ -9,6 +9,7 @@
   "bin": "index.js",
   "scripts": {
     "ts": "tsc",
+    "ts:watch": "tsc -w",
     "build": "tsc && pkg . --out-path dist/ --compress GZip",
     "build:debug": "tsc && pkg . --debug --out-path dist/ --compress GZip"
   },

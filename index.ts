@@ -7,6 +7,13 @@ interface Config {
     infiniteLoop?: boolean;
     passwordLength?: number;
     verboseMode?: boolean;
+// -----------------------
+    passwordCount?: number;
+    numbersOnly?: boolean;
+    upperOnly?: boolean;
+    lowerOnly?: boolean;
+    symbolsOnly?: boolean;
+    extSymbols?: boolean;
 }
 (async function() {
     const { randomFromArray } = await import('@santi100/random-lib');
@@ -40,37 +47,63 @@ interface Config {
             console.error(
                 coloring(
                     coloring('✗ An error has ocurred while reading the settings file. ' + error, 'red'),
-                'bold')
-            );
-            process.exit(1);
-        }
-    }
-
-    
-
-
-    const CLI_COMMAND = 'passgen';
-    const NUMS = '1234567890';
-    const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const LOWER = 'abcdefghijklmnopqrstuvwxyz';
-    const SYMBOLS = '°!"#$%&/()=?¡¨*[];:_\\\"\'|!¿';
-    const program = new Command(CLI_COMMAND);
-    const CHARS = conf.chars || 
-    NUMS + UPPER + LOWER + SYMBOLS;
-    const LENGTH = conf.passwordLength || 10;
-    const VERSION = 'v1.0.6';
-
-    program
+                    'bold')
+                    );
+                    process.exit(1);
+                }
+            }
+            const CLI_COMMAND = 'passgen';
+            const VERSION = 'v1.0.7';
+    const program = new Command(CLI_COMMAND)
         .version(VERSION)
         .description('A CLI to generate a random password.')
         .option('-i, --infinite', 'Enter infinite mode.')
         .option('-v, --verbose', 'Enter verbose mode.')
         .option('-a, --about', 'Show about message.')
         .option('-p, --prompt', 'Override flags and prompt the user directly.')
+        .option('-P, --password-count <passwords>', 'The amount of passwords to generate.')
+        .option('-e, --ext-symbols', 'Use extra symbol set.')
+
+        .option('-u, --upper-only', 'Use uppercase letters only.')
+        .option('-l, --lower-only', 'Use lowercase letters only.')
+        .option('-n, --numbers-only', 'Use numbers only.')
+        .option('-s, --symbols-only', 'Use symbols only.')
+        
         .option('-c, --create', 'Scaffold a basic settings file.')
         .parse(process.argv);
         
         const options = program.opts();
+        function getCharset({ numbersOnly, upperOnly, lowerOnly, symbolsOnly, extSymbols }: Record<Key, boolean>): string {
+            if (numbersOnly) return NUMS;
+            if (upperOnly) return UPPER;
+            if (lowerOnly) return LOWER;
+            if (symbolsOnly) return SYMBOLS;
+    
+            return NUMS.concat(UPPER, LOWER, SYMBOLS, extSymbols ? EXT_SYMBOLS : '');
+        }
+ const
+        numbersOnly = conf.numbersOnly || options.numbersOnly,
+        upperOnly = conf.upperOnly || options.upperOnly,
+        lowerOnly = conf.lowerOnly || options.lowerOnly,
+        symbolsOnly = conf.symbolsOnly || options.symbolsOnly,
+        extSymbols = conf.extSymbols || options.extSymbols;
+   
+    const LENGTH = conf.passwordLength || 10;
+
+    const NUMS = '1234567890';
+    const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const LOWER = 'abcdefghijklmnopqrstuvwxyz';
+    const SYMBOLS = '!"#$%&_\'!';
+    const EXT_SYMBOLS = '°¿¡¨\\|/=?*;():[]';
+    
+    const CHARS = conf.chars || 
+ getCharset({
+        numbersOnly, upperOnly, lowerOnly, symbolsOnly, extSymbols
+    });
+
+
+        const passwordCount = parseInt(options.passwordCount) || conf.passwordCount;
+
         if (options.create) {
             async function create() {
                 try {
@@ -99,6 +132,7 @@ interface Config {
         if (!FS.existsSync(CONF_PATH)) {
             const { prom } = await inquirer.prompt({
                 name: 'prom',
+                type: 'confirm',
                 message: `File ${CONF_PATH} doesn't exist. Prompt for options?`
             });
             if (prom) await prompt();
@@ -148,17 +182,38 @@ interface Config {
         const VERBOSE_PROMPT = coloring(coloring('[VERBOSE]', 'cyan'), 'bold')
         
         if (VERBOSE_MODE) console.log(`Verbose mode flag or setting specified. 
-    ${coloring('Enabling', 'green')} verbose mode.`);
+${coloring('Enabling', 'green')} verbose mode.`);
+
+if (options.extSymbols || conf.extSymbols) {
+    if (VERBOSE_MODE)
+        console.log(`
+${VERBOSE_PROMPT} Adding extra symbols set to the characters to be used for the password.
+        `)
+    console.log(
+        'Password length: %d. \nPassword: %s.', 
+        LENGTH,
+        generatePassword(LENGTH, CHARS));
+    process.exit();
+}
+if (passwordCount || conf.passwordCount) {
+    const max = passwordCount || conf.passwordCount as number;
+    for (let i = 0; i < max; i++) {
+        console.log('Password #%d: %s', i + 1, generatePassword(LENGTH, CHARS));
+    }
+
+    process.exit();
+}
     
         if (VERBOSE_MODE && !(FS.existsSync(CONF_PATH))) 
             console.log(`${VERBOSE_PROMPT} Settings file doesn't exist.
-    ${VERBOSE_PROMPT} Falling back to command-line flags.
+${VERBOSE_PROMPT} Falling back to command-line flags.
                 `);
         if (VERBOSE_MODE && FS.existsSync(CONF_PATH)) 
-            console.log(`${VERBOSE_PROMPT} Settings file ${CONF_PATH} detected.
-    ${VERBOSE_PROMPT} Now, the settings specified in this file will be used.
-    ${VERBOSE_PROMPT} We recommend that you use the schema at https://santi-apis.vercel.app/utils/json-schema for 
-    ${VERBOSE_PROMPT} this file.
+            console.log(`
+${VERBOSE_PROMPT} Settings file ${CONF_PATH} detected.
+${VERBOSE_PROMPT} Now, the settings specified in this file will be used.
+${VERBOSE_PROMPT} We recommend that you use the schema at https://santi-apis.vercel.app/utils/json-schema for 
+${VERBOSE_PROMPT} this file.
         `);
     function generatePassword(length: number, chars: string) {
         const passArray: string[] = [];
@@ -168,11 +223,12 @@ interface Config {
         return passArray.join('')
     }
     if (options.infinite || conf.infiniteLoop) {
-        if (VERBOSE_MODE) console.log(`${VERBOSE_PROMPT} Infinite mode enabled.
+        if (VERBOSE_MODE) console.log(`
+${VERBOSE_PROMPT} Infinite mode enabled.
 ${VERBOSE_PROMPT} Now, until you press Ctrl-C, thousands of random passwords will be created.
         `);
         console.log(`
-    Password length: ${LENGTH}.
+Password length: ${LENGTH}.
         `)
         let i = 1;
         while (1 === (2 - 1)) {
