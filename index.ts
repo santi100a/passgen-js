@@ -1,25 +1,29 @@
 #! /usr/bin/env node
 
-import { randomFromArray } from './lib/random-cjs.js';
-import { coloring } from './lib/coloring-cjs.js';
-import { Command } from 'commander';
-import { textSync } from 'figlet';
-
-import * as FS from 'node:fs';
-
 const CLI_NAME = 'Random Password Generator';
 
-console.clear();
-console.log(coloring(
-        coloring(textSync(CLI_NAME, 'Standard'), 'bold'), 'cyan'
-        ));
+interface Config {
+    chars?: string;
+    infiniteLoop?: boolean;
+    passwordLength?: number;
+    verboseMode?: boolean;
+}
 (async function() {
-    const inquirer = require('inquirer')
+    const { randomFromArray } = await import('@santi100/random-lib');
+    const { coloring } = await import('@santi100/coloring-lib');
+    const { Command } = await import('commander');
+    const { default: { textSync } } = await import('figlet');
+    const FS = await import('node:fs');
+    const { default: inquirer } = await import('inquirer');
+
     const CONF_PATH = './pgconfig.json';
 
     type Key = string | number | symbol;
-
-    async function readJSON(file: FS.PathLike, encoding?: BufferEncoding): Promise<[
+    console.clear();
+    console.log(coloring(
+            coloring(textSync(CLI_NAME, 'Standard'), 'bold'), 'cyan'
+            ));
+    async function readJSON(file: import('node:fs').PathLike, encoding?: BufferEncoding): Promise<[
     Record<Key, any>    
     , null] | [null, Error]>
     {
@@ -30,7 +34,7 @@ console.log(coloring(
         }
     }
     const [ config, error ] = await readJSON(CONF_PATH);
-    const conf = config as Record<any, any> || {};
+    const conf = config as Config || {};
     if (error) {
         if (FS.existsSync(CONF_PATH)) {
             console.error(
@@ -54,7 +58,7 @@ console.log(coloring(
     const CHARS = conf.chars || 
     NUMS + UPPER + LOWER + SYMBOLS;
     const LENGTH = conf.passwordLength || 10;
-    const VERSION = 'v1.0.5';
+    const VERSION = 'v1.0.6';
 
     program
         .version(VERSION)
@@ -100,6 +104,7 @@ console.log(coloring(
             if (prom) await prompt();
         }
         if (options.prompt) await prompt();
+        
         async function prompt() {
             const { infinite } = await inquirer.prompt({
                 name: 'infinite',
@@ -113,13 +118,13 @@ console.log(coloring(
             });
             const { len: lenString } = await inquirer.prompt({
                 name: 'len',
-                type: 'text',
+                type: 'input',
                 message: 'Enter password length:',
             });
             const len = Number(lenString);
             const { chars } = await inquirer.prompt({
                 name: 'chars',
-                type: 'text',
+                type: 'input',
                 message: 'Type all characters you want to use for the password (press ENTER ⤷ to use default):',
             });
             if (verbose) console.log('Verbose mode %s', coloring('enabled.', 'green'));

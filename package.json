@@ -1,6 +1,6 @@
 {
   "name": "@santi100/passgen",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "repository": {
     "url": "https://github.com/santi100a/passgen-js.git"
   },
@@ -8,7 +8,9 @@
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
-    "build": "tsc && pkg . --out-path dist/ --compress GZip"
+    "ts": "tsc",
+    "build": "tsc && pkg . --out-path dist/ --compress GZip",
+    "build:debug": "tsc && pkg . --debug --out-path dist/ --compress GZip"
   },
   "pkg": {
     "assets": [
@@ -21,17 +23,20 @@
   },
   "keywords": [],
   "author": "@santi100",
-  "license": "ISC",
+  "license": "Other",
+  "type": "module",
   "dependencies": {
+    "@santi100/assertion-lib": "^1.0.3",
+    "@santi100/coloring-lib": "^1.0.5",
+    "@santi100/random-lib": "^1.0.5",
     "commander": "^9.4.1",
     "figlet": "^1.5.2",
-    "inquirer": "8.2.5"
+    "inquirer": "^9.1.4"
   },
   "devDependencies": {
     "@types/figlet": "^1.5.5",
-    "@types/inquirer": "9.0.2",
-    "@types/node": "^18.11.9",
-    "pkg": "^5.8.0",
-    "typescript": "^4.8.4"
+    "@types/inquirer": "^9.0.3",
+    "@types/node": "^18.11.11",
+    "pkg": "^5.8.0"
   }
 }

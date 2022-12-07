@@ -1,40 +1,15 @@
 #! /usr/bin/env node
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const random_cjs_js_1 = require("./lib/random-cjs.js");
-const coloring_cjs_js_1 = require("./lib/coloring-cjs.js");
-const commander_1 = require("commander");
-const figlet_1 = require("figlet");
-const FS = __importStar(require("node:fs"));
 const CLI_NAME = 'Random Password Generator';
-console.clear();
-console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, figlet_1.textSync)(CLI_NAME, 'Standard'), 'bold'), 'cyan'));
 (async function () {
-    const inquirer = require('inquirer');
+    const { randomFromArray } = await import('@santi100/random-lib');
+    const { coloring } = await import('@santi100/coloring-lib');
+    const { Command } = await import('commander');
+    const { default: { textSync } } = await import('figlet');
+    const FS = await import('node:fs');
+    const { default: inquirer } = await import('inquirer');
     const CONF_PATH = './pgconfig.json';
+    console.clear();
+    console.log(coloring(coloring(textSync(CLI_NAME, 'Standard'), 'bold'), 'cyan'));
     async function readJSON(file, encoding) {
         try {
             return [JSON.parse(await FS.promises.readFile(file, encoding || 'utf8')), null];
@@ -47,7 +22,7 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
     const conf = config || {};
     if (error) {
         if (FS.existsSync(CONF_PATH)) {
-            console.error((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)('✗ An error has ocurred while reading the settings file. ' + error, 'red'), 'bold'));
+            console.error(coloring(coloring('✗ An error has ocurred while reading the settings file. ' + error, 'red'), 'bold'));
             process.exit(1);
         }
     }
@@ -56,11 +31,11 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
     const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const LOWER = 'abcdefghijklmnopqrstuvwxyz';
     const SYMBOLS = '°!"#$%&/()=?¡¨*[];:_\\\"\'|!¿';
-    const program = new commander_1.Command(CLI_COMMAND);
+    const program = new Command(CLI_COMMAND);
     const CHARS = conf.chars ||
         NUMS + UPPER + LOWER + SYMBOLS;
     const LENGTH = conf.passwordLength || 10;
-    const VERSION = 'v1.0.5';
+    const VERSION = 'v1.0.6';
     program
         .version(VERSION)
         .description('A CLI to generate a random password.')
@@ -86,15 +61,15 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
         if (!FS.existsSync(CONF_PATH)) {
             const err = await create();
             if (!err)
-                console.log((0, coloring_cjs_js_1.coloring)(`✓ Successfully created ${CONF_PATH}.`, 'green'));
+                console.log(coloring(`✓ Successfully created ${CONF_PATH}.`, 'green'));
             else {
-                console.log((0, coloring_cjs_js_1.coloring)('✗ An error has ocurred while creating the settings file. ' + err, 'red'));
+                console.log(coloring('✗ An error has ocurred while creating the settings file. ' + err, 'red'));
                 process.exit(1);
             }
             process.exit(0);
         }
         else {
-            console.log((0, coloring_cjs_js_1.coloring)('🛈 The settings file exists already.', 'cyan'));
+            console.log(coloring('🛈 The settings file exists already.', 'cyan'));
             process.exit(0);
         }
     }
@@ -121,17 +96,17 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
         });
         const { len: lenString } = await inquirer.prompt({
             name: 'len',
-            type: 'text',
+            type: 'input',
             message: 'Enter password length:',
         });
         const len = Number(lenString);
         const { chars } = await inquirer.prompt({
             name: 'chars',
-            type: 'text',
+            type: 'input',
             message: 'Type all characters you want to use for the password (press ENTER ⤷ to use default):',
         });
         if (verbose)
-            console.log('Verbose mode %s', (0, coloring_cjs_js_1.coloring)('enabled.', 'green'));
+            console.log('Verbose mode %s', coloring('enabled.', 'green'));
         if (infinite) {
             let i = 1;
             while (true) {
@@ -149,10 +124,10 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
         process.exit(0);
     }
     const VERBOSE_MODE = conf.verboseMode || options.verbose;
-    const VERBOSE_PROMPT = (0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)('[VERBOSE]', 'cyan'), 'bold');
+    const VERBOSE_PROMPT = coloring(coloring('[VERBOSE]', 'cyan'), 'bold');
     if (VERBOSE_MODE)
         console.log(`Verbose mode flag or setting specified. 
-    ${(0, coloring_cjs_js_1.coloring)('Enabling', 'green')} verbose mode.`);
+    ${coloring('Enabling', 'green')} verbose mode.`);
     if (VERBOSE_MODE && !(FS.existsSync(CONF_PATH)))
         console.log(`${VERBOSE_PROMPT} Settings file doesn't exist.
     ${VERBOSE_PROMPT} Falling back to command-line flags.
@@ -166,7 +141,7 @@ console.log((0, coloring_cjs_js_1.coloring)((0, coloring_cjs_js_1.coloring)((0, 
     function generatePassword(length, chars) {
         const passArray = [];
         Array(length).fill(null).forEach(() => {
-            passArray.push((0, random_cjs_js_1.randomFromArray)(chars.split('')));
+            passArray.push(randomFromArray(chars.split('')));
         });
         return passArray.join('');
     }
@@ -200,3 +175,4 @@ Password length: ${LENGTH}.
 Password: ${password}.
     `);
 })();
+export {};
