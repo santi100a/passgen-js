@@ -27,12 +27,12 @@
   "license": "Other",
   "type": "module",
   "dependencies": {
-    "@santi100/assertion-lib": "^1.0.3",
+    "@santi100/assertion-lib": "^1.0.4",
     "@santi100/coloring-lib": "^1.0.5",
-    "@santi100/random-lib": "^1.0.5",
+    "@santi100/random-lib": "^1.0.6",
     "commander": "^9.4.1",
     "figlet": "^1.5.2",
-    "inquirer": "^9.1.4"
+    "inquirer": "8.0.1"
   },
   "devDependencies": {
     "@types/figlet": "^1.5.5",
