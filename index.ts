@@ -22,10 +22,9 @@ interface Config {
     const { default: { textSync } } = await import('figlet');
     const FS = await import('node:fs');
     const { default: inquirer } = await import('inquirer');
-
     const CONF_PATH = './pgconfig.json';
-
     type Key = string | number | symbol;
+
     console.clear();
     console.log(coloring(
             coloring(textSync(CLI_NAME, 'Standard'), 'bold'), 'cyan'

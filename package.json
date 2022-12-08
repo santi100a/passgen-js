@@ -10,8 +10,7 @@
   "scripts": {
     "ts": "tsc",
     "ts:watch": "tsc -w",
-    "build": "tsc && pkg . --out-path dist/ --compress GZip",
-    "build:debug": "tsc && pkg . --debug --out-path dist/ --compress GZip"
+    "build": "node build.js"
   },
   "pkg": {
     "assets": [
@@ -38,6 +37,8 @@
     "@types/figlet": "^1.5.5",
     "@types/inquirer": "^9.0.3",
     "@types/node": "^18.11.11",
+    "@types/typescript": "^2.0.0",
+    "caxa": "^3.0.1",
     "pkg": "^5.8.0"
   }
 }

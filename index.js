@@ -1,4 +1,6 @@
 #! /usr/bin/env node
+"use strict";
+
 const CLI_NAME = 'Random Password Generator';
 (async function () {
     const { randomFromArray } = await import('@santi100/random-lib');
@@ -214,4 +216,3 @@ Password length: ${LENGTH}.
 Password: ${password}.
     `);
 })();
-export {};
